@@ -52,6 +52,12 @@ set(BREEZE_SOURCES
     src/model.cpp
 )
 
+# MSVC reads sources in the ANSI code page unless told otherwise, which mangles the non-ASCII
+# characters in the server banner
+if(MSVC)
+    add_compile_options(/utf-8)
+endif()
+
 add_library(breeze_core STATIC ${BREEZE_SOURCES})
 target_include_directories(breeze_core PUBLIC include)
 target_link_libraries(breeze_core PUBLIC ggml)
