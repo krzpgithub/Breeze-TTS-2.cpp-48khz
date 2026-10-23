@@ -216,7 +216,7 @@ void ws_connection(WsConn & conn, BreezeModel & model, MimiCodec & codec, VoiceS
                    std::mutex & gpu, int chunk_first, int chunk_max, int split_chars) {
     Session s;
     std::thread worker([&] { speaker(conn, s, gpu); });
-    event(conn, "ready", "\"sample_rate\":24000,\"format\":\"s16le\"");
+    event(conn, "ready", "\"sample_rate\":" + std::to_string(model.cfg.sample_rate) + ",\"format\":\"s16le\"");
 
     std::string msg;
     bool binary = false;

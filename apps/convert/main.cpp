@@ -77,14 +77,14 @@ int main(int argc, char ** argv) {
     codec.init(model);
 
     std::vector<float> src;
-    if (!read_wav(source, model.cfg.sample_rate, src)) {
+    if (!read_wav(source, kCodecInputSr, src)) {
         fprintf(stderr, "failed to read %s\n", source.c_str());
         return 1;
     }
     int T = 0;
     std::vector<int> codes = codec.encode(src, T);
     const int nc = model.cfg.num_codebooks;
-    printf("source %.2f s, %d frames\n", (float) src.size() / model.cfg.sample_rate, T);
+    printf("source %.2f s, %d frames\n", (float) src.size() / kCodecInputSr, T);
 
     std::vector<float> audio;
     if (keep > 0) {
@@ -100,7 +100,7 @@ int main(int argc, char ** argv) {
             fprintf(stderr, "conversion needs --ref-audio and --ref-text\n");
             return 1;
         }
-        if (!read_wav(ref_audio, model.cfg.sample_rate, ref)) {
+        if (!read_wav(ref_audio, kCodecInputSr, ref)) {
             fprintf(stderr, "failed to read %s\n", ref_audio.c_str());
             return 1;
         }

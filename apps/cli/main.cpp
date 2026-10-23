@@ -85,7 +85,7 @@ int main(int argc, char ** argv) {
         if (found.empty()) { printf("no voices in %s\n", voices_dir.c_str()); return 0; }
         for (const Voice & v : found) {
             printf("%-24s %6.2f s  %s\n", v.name.c_str(),
-                   (double) v.frames * 1920 / v.sample_rate, v.text.c_str());
+                   (double) v.frames / 12.5, v.text.c_str());
             if (!v.description.empty()) printf("%-24s           %s\n", "", v.description.c_str());
         }
         return 0;
@@ -124,7 +124,7 @@ int main(int argc, char ** argv) {
     printf("backend: %s, sample rate: %d\n", model.backend.name(), model.cfg.sample_rate);
 
     if (!ref_audio_path.empty()) {
-        if (!read_wav(ref_audio_path, model.cfg.sample_rate, req.ref_audio)) {
+        if (!read_wav(ref_audio_path, kCodecInputSr, req.ref_audio)) {
             fprintf(stderr, "failed to read reference audio\n");
             return 1;
         }

@@ -252,7 +252,7 @@ int run_server(const ServerOptions & opts) {
                 const std::string key = voice_key(f.content, g.ref_text);
                 if (!store.take(key, g.ref_codes, g.ref_frames, g.ref_text)) {
                     std::vector<float> pcm;
-                    if (read_wav_buffer((const uint8_t *) f.content.data(), f.content.size(), sr, pcm) && !pcm.empty()) {
+                    if (read_wav_buffer((const uint8_t *) f.content.data(), f.content.size(), kCodecInputSr, pcm) && !pcm.empty()) {
                         CachedVoice v;
                         v.text = g.ref_text;
                         const auto t0 = std::chrono::steady_clock::now();
@@ -269,7 +269,7 @@ int run_server(const ServerOptions & opts) {
                     fflush(stdout);
                 }
             } else if (!f.content.empty()) {
-                read_wav_buffer((const uint8_t *) f.content.data(), f.content.size(), sr, g.ref_audio);
+                read_wav_buffer((const uint8_t *) f.content.data(), f.content.size(), kCodecInputSr, g.ref_audio);
             }
         }
         const std::string vid = field(req, "voice_id", "");
@@ -318,7 +318,7 @@ int run_server(const ServerOptions & opts) {
             if (!req.has_file(name)) return false;
             const auto & f = req.get_file_value(name);
             return !f.content.empty() &&
-                   read_wav_buffer((const uint8_t *) f.content.data(), f.content.size(), sr, out);
+                   read_wav_buffer((const uint8_t *) f.content.data(), f.content.size(), kCodecInputSr, out);
         };
         if (!load("source", src)) {
             res.status = 400;
@@ -346,7 +346,7 @@ int run_server(const ServerOptions & opts) {
             return;
         }
 
-        printf("conv %.2f s source, %s\n", (double) src.size() / sr,
+        printf("conv %.2f s source, %s\n", (double) src.size() / kCodecInputSr,
                vframes > 0 ? "cached reference" : "uploaded reference");
         fflush(stdout);
         try {

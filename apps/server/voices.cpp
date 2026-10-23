@@ -220,7 +220,7 @@ void VoiceStore::add_routes(httplib::Server & svr, BreezeModel & model, MimiCode
         if (!err.empty()) return fail(res, 400, err);
 
         std::vector<float> pcm;
-        read_wav_buffer((const uint8_t *) f.content.data(), f.content.size(), sr, pcm);
+        read_wav_buffer((const uint8_t *) f.content.data(), f.content.size(), kCodecInputSr, pcm);
         if (pcm.empty()) return fail(res, 400, "could not read ref_audio");
 
         // encoding runs on the same device generation does, so it waits its turn

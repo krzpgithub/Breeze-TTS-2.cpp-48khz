@@ -6,9 +6,12 @@ and SnakeBeta decoder blocks.
 """
 from __future__ import annotations
 
+import math
+
 import numpy as np
 
 EPS = 1e-5
+CODEC_FRAME_RATE = 12.5  # codec frames per second, the same for the 24 kHz and 48 kHz decoders
 
 
 def expand_depthwise(w):
@@ -161,8 +164,16 @@ def codec_metadata(writer, cfg):
     enc = cfg["encoder_config"]
     dec = cfg["decoder_config"]
     k, f = writer.add_uint32, writer.add_float32
-    k("breeze.sample_rate", cfg["output_sample_rate"])
-    k("breeze.samples_per_frame", cfg["decode_upsample_rate"])
+    # the output rate follows from the decoder stack, not from the stored config fields: the
+    # 48 kHz decoder only appends a rate to upsample_rates and leaves output_sample_rate and
+    # decode_upsample_rate at their 24 kHz values
+    spf = math.prod(dec["upsample_rates"]) * math.prod(dec["upsampling_ratios"])
+    sr = int(round(spf * CODEC_FRAME_RATE))
+    if (cfg.get("output_sample_rate"), cfg.get("decode_upsample_rate")) != (sr, spf):
+        print(f"note: config says {cfg.get('output_sample_rate')} Hz / {cfg.get('decode_upsample_rate')} "
+              f"samples per frame, decoder stack gives {sr} Hz / {spf}; using the latter")
+    k("breeze.sample_rate", sr)
+    k("breeze.samples_per_frame", spf)
 
     k("breeze.codec.hidden_size", enc["hidden_size"])
     k("breeze.codec.block_count", enc["num_hidden_layers"])

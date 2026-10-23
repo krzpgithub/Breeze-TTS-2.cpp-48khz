@@ -6,6 +6,9 @@
 
 namespace breeze {
 
+// the codec encoder only ever sees 24 kHz audio, whatever rate the decoder outputs at
+constexpr int kCodecInputSr = 24000;
+
 // reads a WAV file, returns mono float samples resampled to target_sr
 bool read_wav(const std::string & path, int target_sr, std::vector<float> & out);
 
